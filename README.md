@@ -25,7 +25,7 @@ This project is a simple RESTful API built with Flask, SQLAlchemy, and Flask-Res
 ### Clone the Repository
 
 ```sh
-git clone [<repository_url>](https://github.com/miraz-ezaz/Flask-Assignment.git)
+git clone https://github.com/miraz-ezaz/Flask-Assignment.git
 cd Flask-Assignment
 ```
 
