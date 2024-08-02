@@ -9,7 +9,7 @@ jwt = JWTManager()
 api = Api(
     title='Flask RESTful API',
     version='1.0',
-    description='A simple REST API',
+    description='Flask REST API Assignment',
     security='Bearer Auth',
     authorizations={
         'Bearer Auth': {
