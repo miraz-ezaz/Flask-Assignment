@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 # Load environment variables from .env file
 load_dotenv()
@@ -12,3 +13,4 @@ class Config:
     RESTX_MASK_SWAGGER = False
     ERROR_404_HELP = False
     SECRET_KEY = os.getenv('SECRET_KEY', 'your_secret_key')
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=30)  # Set token expiration to 30 minutes

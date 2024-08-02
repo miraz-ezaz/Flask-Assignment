@@ -1,7 +1,6 @@
 from flask_restx import Namespace, Resource, fields
 from .models import User, db, UserRole
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from flask import request, jsonify
 
 api = Namespace('api', description='API operations')
 
@@ -81,9 +80,23 @@ class UserList(Resource):
 @api.response(404, 'User not found')
 class UserDetail(Resource):
     @jwt_required()
+    @api.doc(security='Bearer Auth')
+    def get(self, username):
+        current_user = get_jwt_identity()
+        if current_user != username:
+            return {"message": "Unauthorized access"}, 403
+        
+        user = User.query.filter_by(username=username).first_or_404()
+        return user.to_dict()
+
+    @jwt_required()
     @api.expect(user_model)
     @api.doc(security='Bearer Auth')
     def put(self, username):
+        current_user = get_jwt_identity()
+        if current_user != username:
+            return {"message": "Unauthorized access"}, 403
+
         user = User.query.filter_by(username=username).first_or_404()
         data = api.payload
         user.first_name = data.get('first_name', user.first_name)
@@ -96,23 +109,62 @@ class UserDetail(Resource):
     @jwt_required()
     @api.doc(security='Bearer Auth')
     def delete(self, username):
+        current_user = get_jwt_identity()
+        if current_user != username:
+            return {"message": "Unauthorized access"}, 403
+
         user = User.query.filter_by(username=username).first_or_404()
         db.session.delete(user)
         db.session.commit()
         return {"message": "User deleted successfully"}, 200
 
-@api.route('/admin/users')
-class AdminUserList(Resource):
+@api.route('/admin/user/<string:username>')
+@api.response(404, 'User not found')
+class AdminUserDetail(Resource):
     @jwt_required()
-    @api.marshal_list_with(user_model)
     @api.doc(security='Bearer Auth')
-    def get(self):
+    def get(self, username):
         current_user = get_jwt_identity()
         user = User.query.filter_by(username=current_user).first()
-        if user.role != UserRole.ADMIN:
-            return {"message": "Admins only!"}, 403
-        users = User.query.all()
-        return users
+
+        if user.role != UserRole.ADMIN and current_user != username:
+            return {"message": "Unauthorized access"}, 403
+        
+        target_user = User.query.filter_by(username=username).first_or_404()
+        return target_user.to_dict()
+
+    @jwt_required()
+    @api.expect(user_model)
+    @api.doc(security='Bearer Auth')
+    def put(self, username):
+        current_user = get_jwt_identity()
+        user = User.query.filter_by(username=current_user).first()
+
+        if user.role != UserRole.ADMIN and current_user != username:
+            return {"message": "Unauthorized access"}, 403
+
+        target_user = User.query.filter_by(username=username).first_or_404()
+        data = api.payload
+        target_user.first_name = data.get('first_name', target_user.first_name)
+        target_user.last_name = data.get('last_name', target_user.last_name)
+        target_user.email = data.get('email', target_user.email)
+        target_user.active = data.get('active', target_user.active)
+        db.session.commit()
+        return {"message": "User updated successfully"}, 200
+
+    @jwt_required()
+    @api.doc(security='Bearer Auth')
+    def delete(self, username):
+        current_user = get_jwt_identity()
+        user = User.query.filter_by(username=current_user).first()
+
+        if user.role != UserRole.ADMIN and current_user != username:
+            return {"message": "Unauthorized access"}, 403
+
+        target_user = User.query.filter_by(username=username).first_or_404()
+        db.session.delete(target_user)
+        db.session.commit()
+        return {"message": "User deleted successfully"}, 200
 
 @api.route('/reset_password_request')
 class ResetPasswordRequest(Resource):
