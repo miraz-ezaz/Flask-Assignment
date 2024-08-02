@@ -25,8 +25,8 @@ This project is a simple RESTful API built with Flask, SQLAlchemy, and Flask-Res
 ### Clone the Repository
 
 ```sh
-git clone <repository_url>
-cd flask_restful_api
+git clone [<repository_url>](https://github.com/miraz-ezaz/Flask-Assignment.git)
+cd Flask-Assignment
 ```
 
 ### Create and Activate Virtual Environment
@@ -40,18 +40,6 @@ source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
 
 ```sh
 pip install -r requirements.txt
-```
-
-### Set Up PostgreSQL User
-
-Create a new PostgreSQL user and database:
-
-```sh
-psql -U postgres -c "CREATE USER your_username WITH PASSWORD 'your_password';"
-psql -U postgres -c "ALTER ROLE your_username SET client_encoding TO 'utf8';"
-psql -U postgres -c "ALTER ROLE your_username SET default_transaction_isolation TO 'read committed';"
-psql -U postgres -c "ALTER ROLE your_username SET timezone TO 'UTC';"
-psql -U postgres -c "CREATE DATABASE your_db_name OWNER your_username;"
 ```
 
 ### Configure Environment Variables
